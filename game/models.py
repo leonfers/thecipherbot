@@ -63,7 +63,7 @@ class TheWorld(models.Model):
 
         unit = Unit()
         unit.player = player
-        unit.category = UNIT_TYPES[randrange(0,1,1)]
+        unit.category = UNIT_TYPES[randrange(0, 1, 1)]
         unit.field = None
         unit.save()
         print('Unit created')
@@ -104,7 +104,7 @@ class Player(models.Model):
         return self.name
 
 
-UNIT_TYPES = ['Peon','Spy']
+UNIT_TYPES = ['Peon', 'Spy']
 
 
 class Unit(models.Model):
@@ -191,6 +191,15 @@ class Interface():
             for unit in units:
                 overview += '\n an allied ' + str(unit) + ' at ' + unit.field.name
 
+            enemy_units = Unit.objects.all();
+            enemy_units_same_territory = []
+            for unit in enemy_units:
+                if (unit.player.territory == player.territory):
+                    enemy_units_same_territory.append(unit)
+            overview += '\n\nYou are up against ' + str(
+                len(Player.objects.filter(territory=player.territory).all()) - 1) + ' rivals.\n' \
+                                                                                    'There are ' + str(
+                len(enemy_units_same_territory) - len(player.units.all())) + ' enemy units left in the war.'
             return overview
         else:
             return 'What units? ( /enter name_world)'
