@@ -1,23 +1,38 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from game.theworld import TheWorld
 
-class Profile(models.Model):
+
+class Territory(models.Model):
+    name = models.CharField(max_length=255, null=False)
+    world = models.ForeignKey(TheWorld, related_name='territories', on_delete=models.CASCADE)
+
+
+class Field(models.Model):
+    name = models.CharField(max_length=255, null=False)
+    territory = models.ForeignKey(Territory, related_name='fields', on_delete=models.CASCADE)
+
+
+class Player(models.Model):
     name = models.CharField(max_length=255, null=False)
     identifier = models.CharField(max_length=255, null=False)
+    territory = models.ForeignKey(Territory, related_name='players', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
 
 
-SOLDIER_TYPES = (('P', 'Peon'), ('S', 'Spy'),)
+UNIT_TYPES = (('P', 'Peon'), ('S', 'Spy'),)
 
 
-class Soldier(models.Model):
+class Unit(models.Model):
     name = models.CharField(max_length=255, null=False)
-    category = models.CharField(max_length=255, choices=SOLDIER_TYPES, null=False)
+    category = models.CharField(max_length=255, choices=UNIT_TYPES, null=False)
+    field = models.ForeignKey(Field, related_name='units', on_delete=models.CASCADE)
+    player = models.ForeignKey(Player,related_name='units',on_delete=models.CASCADE)
 
-    def atacar(self):
+    def action(self):
         pass
 
     def __str__(self):
@@ -32,10 +47,13 @@ class Command(models.Model):
     origin = models.CharField(max_length=255, null=False)
     target = models.CharField(max_length=255, null=False)
     action = models.CharField(max_length=255, null=False)
-    soldier = models.ForeignKey(Soldier, on_delete=models.DO_NOTHING)
+    soldier = models.ForeignKey(Unit, on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return self.origin + self.target + self.action + str(self.soldier)
+
+    def execute(self):
+        print("Teste " + self)
 
 
 TRANSMISSION_STATUS = (('C', 'COMPLETED'), ('I', 'INTERCEPTED'), ('T', 'TRANSIT'), ('D', 'DAMAGED'))
@@ -55,22 +73,3 @@ class Message(models.Model):
     text = models.CharField(max_length=400, null=False)
     identifier = models.IntegerField(null=False)
     date = models.DateTimeField()
-
-
-# class TelegramUpdate(models.Model):
-#     update_id = models.IntegerField()
-#
-#
-# class TelegramUser(models.Model):
-#     id = models.IntegerField()
-#     username = models.CharField(max_length=200)
-#
-# class TelegramChat(models.Model):
-#     id = models.IntegerField()
-#
-#
-# class TelegramMessage(models.Model):
-#     message_id = models.IntegerField()
-#     text = models.CharField(max_length=800)
-#     user = models.ForeignKey(TelegramUser, on_delete=models.DO_NOTHING)
-#     chat = models.ForeignKey(TelegramChat, on_delete=models.DO_NOTHING())
