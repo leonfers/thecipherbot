@@ -15,20 +15,27 @@ class TelegramUpdate(viewsets.ViewSet):
     the_world = TheWorld()
 
     def create(self, request):
+        message = None
+        identifier = None
         try:
             print("------New update from telegram-----")
             command = request.data['message']['text']
-            identifier = request.data['message']['chat']['id']
             if '/start' in command:
-                world = request.data['message']['text'].split(" ")[1]
-                player_name = request.data['message']['chat']['username']
-                return Interface.start(world, identifier, player_name)
+                identifier = request.data['message']['chat']['id']
+                if len(request.data['message']['text'].split(" ")) == 1:
+                    message = 'Which world do you wish to fight for?( /start world_name )'
+                else:
+                    world = request.data['message']['text'].split(" ")[1]
+                    player_name = request.data['message']['chat']['username']
+                    message = Interface.start(world, identifier, player_name)
             elif '/leave' in command:
-                return Interface.leave(identifier)
+                identifier = request.data['message']['chat']['id']
+                message = Interface.leave(identifier)
 
             print("------End update from telegram-----")
         except Exception as e:
             print('MORREU')
             print(e)
-        self.telegram.sendMessage(request.data['message']['text'], request.data['message']['chat']['id'])
+        if (identifier):
+            self.telegram.sendMessage(message, identifier)
         return Response(status=status.HTTP_200_OK)

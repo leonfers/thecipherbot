@@ -35,7 +35,7 @@ class TheWorld(models.Model):
             territory.save()
             print('Territorio criado')
 
-        TheWorld.getTheWorld().createPlayer(identifier, player_name, territory);
+        return TheWorld.getTheWorld().createPlayer(identifier, player_name, territory);
 
     def createPlayer(self, identifier, player_name, territory):
         player = Player.objects.filter(identifier=identifier).first()
@@ -68,6 +68,8 @@ class TheWorld(models.Model):
             print('Player ' + player_name + 'created')
         else:
             print('Player ' + player_name + 'loaded')
+        player.territory = territory
+        player.save()
 
         return player
 
@@ -146,11 +148,11 @@ class Interface():
     def start(world, identifier, player_name):
         player = Player.objects.filter(identifier=identifier).first()
         if player and player.territory is not None:
-            return "You have a kingdom to defend, to not flee to another world!"
+            return "You have a kingdom to defend, do not flee to another world!"
         else:
             TheWorld.getTheWorld().createTerritory(world, identifier, player_name)
             return "Might CIO " + player_name + " do your best to defeat our enemies in this " \
-                                                "war of information, repair our kingdom " + player.territory.name + " to prosperity " \
+                                                "war of information, repair our kingdom " + world + " to prosperity " \
                                                                                                                     "with your Information Skills! "
 
     @staticmethod
@@ -160,9 +162,9 @@ class Interface():
             territory = player.territory
             player.territory = None
             player.save()
-            if len(territory.players) == 0:
+            if len(territory.players.all()) == 0:
                 territory.delete()
-                return "Ou hero, may your journey to other counties be amazing, thank you for saving us!"
+                return "Our hero, may your journey to other counties be amazing, thank you for saving us!"
             else:
                 return "Coward, we trusted you, know that you will be not missed, we will win this war by ourselves!"
         else:
