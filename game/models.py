@@ -205,24 +205,24 @@ class Interface():
             return 'What units? ( /enter name_world)'
 
 
-@staticmethod
-def opponents(self, player):
-    print("dentro")
+    @staticmethod
+    def opponents(self, player):
+        print("dentro")
 
 
-@staticmethod
-def history(identifier):
-    player = Player.objects.filter(identifier=identifier).first()
-    if (player and player.territory):
-        if (len(player.territory.players.all()) > 1):
-            return 'The land of ' + str(player.territory) + ' has ' + str(
-                len(player.territory.players.all())) + ' rulers. \n' \
-                                                       'We trust you ' + player.name + ' to protect our good leader from their rivals and repair the damage ' \
-                                                                                       'caused by this war. \n\n' \
-                                                                                       'We believe your cunning tactics and masterful manipulation of information can turn the tides of this war and end it ' \
-                                                                                       'once and for all.\n\n' \
-                                                                                       'Uncover the plot of the vilains, by intercepting their commands, repair the information if needed and counter atack their evil plans!'
+    @staticmethod
+    def history(identifier):
+        player = Player.objects.filter(identifier=identifier).first()
+        if (player and player.territory):
+            if (len(player.territory.players.all()) > 1):
+                return 'The land of ' + str(player.territory) + ' has ' + str(
+                    len(player.territory.players.all())) + ' rulers. \n' \
+                                                           'We trust you ' + player.name + ' to protect our good leader from their rivals and repair the damage ' \
+                                                                                           'caused by this war. \n\n' \
+                                                                                           'We believe your cunning tactics and masterful manipulation of information can turn the tides of this war and end it ' \
+                                                                                           'once and for all.\n\n' \
+                                                                                           'Uncover the plot of the vilains, by intercepting their commands, repair the information if needed and counter atack their evil plans!'
+            else:
+                return 'The land of ' + str(player.territory) + ' is in peace.'
         else:
-            return 'The land of ' + str(player.territory) + ' is in peace.'
-    else:
-        return 'History of where? ( /enter world_name )'
+            return 'History of where? ( /enter world_name )'
