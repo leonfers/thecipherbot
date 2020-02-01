@@ -8,9 +8,6 @@ class TelegramApi():
 
     def sendMessage(self, message, chat_id):
         r = requests.post(url=self.bot_url + 'sendMessage', json={"text": message, "chat_id": chat_id})
-        print(r.status_code)
-        print(r.reason)
-        print(r.json())
 
     @staticmethod
     def getService():

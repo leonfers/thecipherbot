@@ -1,3 +1,5 @@
+from logging import exception
+
 from django.shortcuts import render
 
 # Create your views here.
@@ -15,14 +17,16 @@ class TelegramUpdate(viewsets.ViewSet):
     def create(self, request):
         try:
             print("------New update from telegram-----")
-            if (Player.objects.get(identifer=request.data['message']['chat']['id'])):
+            player = Player.objects.filter(identifier=request.data['message']['chat']['id']).first()
+            if player:
                 print('jogador já existe')
             else:
-                TheWorld.getTheWorld().createTerritory(self, request.data['message']['text'],
+                TheWorld.getTheWorld().createTerritory(request.data['message']['text'],
                                                        request.data['message']['chat']['id'],
                                                        request.data['message']['from']['username'])
-                print("------End update from telegram-----")
-        except:
+            print("------End update from telegram-----")
+        except Exception as e:
             print('MORREU')
+            print(e)
         self.telegram.sendMessage(request.data['message']['text'], request.data['message']['chat']['id'])
         return Response(status=status.HTTP_200_OK)

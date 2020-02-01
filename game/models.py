@@ -1,7 +1,7 @@
 from multiprocessing.pool import Pool
 from random import randrange
 
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import User
 
 from .models import *
@@ -15,11 +15,17 @@ class TheWorld(models.Model):
     @staticmethod
     def getTheWorld():
         if (TheWorld.world == None):
-            TheWorld.world = TheWorld()
+            world = TheWorld.objects.all().first()
+            if(world):
+                TheWorld.world = world
+            else:
+                TheWorld.world = TheWorld()
+                TheWorld.world.save()
         return TheWorld.world
 
     def createTerritory(self, name, identifier, player_name):
-        territory = Territory.objects.get(name='name')
+        territory = Territory.objects.filter(name=name).first()
+        print(territory)
         if (territory is None):
             territory = Territory()
             territory.name = name
@@ -42,27 +48,36 @@ class TheWorld(models.Model):
         print('Unidade posicionada')
 
     def createPlayer(self, identifier, player_name, territory):
-        player = Player.objects.get(identifier=identifier)
+        player = Player.objects.filter(identifier=identifier).first()
         if (player is None):
             player = Player()
+            player.identifier = identifier
             player.name = player_name
             player.territory = territory
             player.save()
+
+            unit = Unit()
+            unit.player = player
+            unit.category = UNIT_TYPES.__getitem__(1)
+            unit.field = None
+            unit.save()
+            print('Unit created')
+
             print('Player '+player_name+'created')
         else:
             print('Player '+player_name+'loaded')
 
-        unit = Unit()
-        unit.player = player
-        unit.category = UNIT_TYPES.__getitem__(1)
-        unit.field = None
-        unit.save()
-        print('Unit created')
+        return player
+
+
 
 
 class Territory(models.Model):
     name = models.CharField(max_length=255, null=False)
     world = models.ForeignKey(TheWorld, related_name='territories', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.name)
 
 
 class Field(models.Model):
@@ -72,7 +87,7 @@ class Field(models.Model):
 
 class Player(models.Model):
     name = models.CharField(max_length=255, null=False)
-    identifier = models.CharField(max_length=255, null=False)
+    identifier = models.IntegerField(null=False)
     territory = models.ForeignKey(Territory, related_name='players', on_delete=models.CASCADE)
 
     def __str__(self):
@@ -85,7 +100,7 @@ UNIT_TYPES = (('P', 'Peon'), ('S', 'Spy'),)
 class Unit(models.Model):
     name = models.CharField(max_length=255, null=False)
     category = models.CharField(max_length=255, choices=UNIT_TYPES, null=False)
-    field = models.ForeignKey(Field, related_name='units', on_delete=models.CASCADE)
+    field = models.ForeignKey(Field, related_name='units', on_delete=models.CASCADE, null=True)
     player = models.ForeignKey(Player,related_name='units',on_delete=models.CASCADE)
 
     def action(self):
