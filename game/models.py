@@ -33,6 +33,14 @@ class TheWorld(models.Model):
             territory.name = name
             territory.world = TheWorld.getTheWorld()
             territory.save()
+
+            for i in range(9):
+                field = Field()
+                field.name = CITIES[i]
+                field.territory = territory
+                field.save()
+                print('Field created')
+
             print('Territorio criado')
 
         return TheWorld.getTheWorld().createPlayer(identifier, player_name, territory);
@@ -46,28 +54,25 @@ class TheWorld(models.Model):
             player.territory = territory
             player.save()
 
-            unit = Unit()
-            unit.player = player
-            unit.category = UNIT_TYPES.__getitem__(1)
-            unit.field = None
-            unit.save()
-            print('Unit created')
-
-            for i in range(9):
-                field = Field()
-                field.name = str(i) + str(i) + str(i) + str(i)
-                field.territory = territory
-                field.save()
-                print('Field created')
-
-            unit = player.units.first()
-            unit.field = territory.fields.all()[randrange(0, 10, 1)]
-            unit.save()
-            print('Unidade posicionada')
-
             print('Player ' + player_name + 'created')
         else:
             print('Player ' + player_name + 'loaded')
+
+        for unit in player.units.all():
+            unit.delete()
+
+        unit = Unit()
+        unit.player = player
+        unit.category = UNIT_TYPES[randrange(0,1,1)]
+        unit.field = None
+        unit.save()
+        print('Unit created')
+
+        unit = player.units.first()
+        unit.field = territory.fields.all()[randrange(0, 10, 1)]
+        unit.save()
+        print('Unidade posicionada')
+
         player.territory = territory
         player.save()
 
@@ -80,6 +85,9 @@ class Territory(models.Model):
 
     def __str__(self):
         return str(self.name)
+
+
+CITIES = ['sparta', 'atenas', 'teresina', 'rio', 'cairo', 'persia', 'nilo', 'japao', 'londres']
 
 
 class Field(models.Model):
@@ -96,12 +104,12 @@ class Player(models.Model):
         return self.name
 
 
-UNIT_TYPES = (('P', 'Peon'), ('S', 'Spy'),)
+UNIT_TYPES = ['Peon','Spy']
 
 
 class Unit(models.Model):
     name = models.CharField(max_length=255, null=False)
-    category = models.CharField(max_length=255, choices=UNIT_TYPES, null=False)
+    category = models.CharField(max_length=255, null=False)
     field = models.ForeignKey(Field, related_name='units', on_delete=models.CASCADE, null=True)
     player = models.ForeignKey(Player, related_name='units', on_delete=models.CASCADE)
 
@@ -109,7 +117,7 @@ class Unit(models.Model):
         pass
 
     def __str__(self):
-        return self.name + self.category[1]
+        return self.category
 
 
 COMMAND_TYPE = (('F', 'FAKE'), ('R', 'REAL'))
@@ -164,35 +172,48 @@ class Interface():
             player.save()
             if len(territory.players.all()) == 0:
                 territory.delete()
+                for unit in player.units.all():
+                    unit.delete()
                 return "Our hero, may your journey to other counties be amazing, thank you for saving us!"
             else:
+                for unit in player.units.all():
+                    unit.delete()
                 return "Coward, we trusted you, know that you will be not missed, we will win this war by ourselves!"
         else:
             return "What exactly are you trying to leave?"
 
     @staticmethod
-    def overview(self, player):
-        category_unit = player.units.all()[0].category
-        over_view = "Mr(s). " + player.name + " you have " + len(player.units.get(category = category_unit)) + " of " + player.units.get(category = category_unit) + " on your territory"
-        print(over_view)
-
-    @staticmethod
-    def opponents(self, player):
-        print("dentro")
-
-    @staticmethod
-    def history(identifier):
+    def overview(identifier):
         player = Player.objects.filter(identifier=identifier).first()
-        if(player and player.territory):
-            if (len(player.territory.players.all()) > 1):
-                return 'The land of ' + str(player.territory)+ ' has ' + str(
-                    len(player.territory.players.all())) + ' rulers. \n' \
-                                                           'We trust you ' + player.name + ' to protect our good leader from their rivals and repair the damage ' \
-                                                                                           'caused by this war. \n\n' \
-                                                                                           'We believe your cunning tactics and masterful manipulation of information can turn the tides of this war and end it ' \
-                                                                                           'once and for all.\n\n' \
-                                                                                           'Uncover the plot of the vilains, by intercepting their commands, repair the information if needed and counter atack their evil plans!'
-            else:
-                return 'The land of ' + str(player.territory) + ' is in peace.'
+        if player and len(player.units.all()) > 0:
+            overview = "Mr(s). " + player.name + " you have : "
+            units = player.units.all()
+            for unit in units:
+                overview += '\n an allied ' + str(unit) + ' at ' + unit.field.name
+
+            return overview
         else:
-            return 'History of where? ( /enter world_name )'
+            return 'What units? ( /enter name_world)'
+
+
+@staticmethod
+def opponents(self, player):
+    print("dentro")
+
+
+@staticmethod
+def history(identifier):
+    player = Player.objects.filter(identifier=identifier).first()
+    if (player and player.territory):
+        if (len(player.territory.players.all()) > 1):
+            return 'The land of ' + str(player.territory) + ' has ' + str(
+                len(player.territory.players.all())) + ' rulers. \n' \
+                                                       'We trust you ' + player.name + ' to protect our good leader from their rivals and repair the damage ' \
+                                                                                       'caused by this war. \n\n' \
+                                                                                       'We believe your cunning tactics and masterful manipulation of information can turn the tides of this war and end it ' \
+                                                                                       'once and for all.\n\n' \
+                                                                                       'Uncover the plot of the vilains, by intercepting their commands, repair the information if needed and counter atack their evil plans!'
+        else:
+            return 'The land of ' + str(player.territory) + ' is in peace.'
+    else:
+        return 'History of where? ( /enter world_name )'

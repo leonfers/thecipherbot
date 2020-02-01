@@ -36,6 +36,11 @@ class TelegramUpdate(viewsets.ViewSet):
                 identifier = request.data['message']['chat']['id']
                 message = Interface.history(identifier)
 
+            elif '/overview' in command:
+                identifier = request.data['message']['chat']['id']
+                message = Interface.overview(identifier)
+
+
             print("------End update from telegram-----")
         except Exception as e:
             print('MORREU')
