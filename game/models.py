@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-from game.theworld import TheWorld
+from .theworld import TheWorld
 
 
 class Territory(models.Model):

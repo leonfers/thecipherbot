@@ -1,8 +1,8 @@
 from multiprocessing import Pool
 from random import randrange
 
-from game import models
-from game.models import Territory, Field, Player, Unit, UNIT_TYPES
+from . import models
+from .models import Territory, Field, Player, Unit, UNIT_TYPES
 
 
 class TheWorld(models.Model):
@@ -13,17 +13,17 @@ class TheWorld(models.Model):
         self.pool.map(event.execute)
 
     @staticmethod
-    def getTheWorld(self):
-        if (self.world == None):
-            world = TheWorld()
-        return world
+    def getTheWorld():
+        if (TheWorld.world == None):
+            TheWorld.world = TheWorld()
+        return TheWorld.world
 
     def createTerritory(self, name, identifier, player_name):
         territory = Territory.objects.get(name='name')
         if (territory is None):
             territory = Territory()
             territory.name = name
-            territory.world = TheWorld.getTheWorld(self)
+            territory.world = TheWorld.getTheWorld()
             territory.save()
             print('Territorio criado')
 
@@ -39,6 +39,7 @@ class TheWorld(models.Model):
         unit = player.units.first()
         unit.field = territory.fields.all()[randrange(0, 10, 1)]
         unit.save()
+        print('Unidade posicionada')
 
     def createPlayer(self, identifier, player_name, territory):
         player = Player.objects.get(identifier=identifier)
