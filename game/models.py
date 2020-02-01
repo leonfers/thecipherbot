@@ -1,9 +1,11 @@
+from datetime import time
 from multiprocessing.pool import Pool
 from random import randrange
 
 from django.db import models, transaction
 from django.contrib.auth.models import User
 
+from telegramapi.models import TelegramApi
 from .models import *
 
 
@@ -11,8 +13,8 @@ class TheWorld(models.Model):
     world = None
     pool = Pool()
 
-    def addEvent(self, event):
-        self.pool.map(event.execute)
+    def addEvent(event):
+        TheWorld.pool.map(event.execute)
 
     @staticmethod
     def getTheWorld():
@@ -120,21 +122,41 @@ class Unit(models.Model):
         return self.category
 
 
-COMMAND_TYPE = (('F', 'FAKE'), ('R', 'REAL'))
+ACTIONS = ['attack', 'ambush', 'defend']
 
 
 class Command(models.Model):
-    type = models.CharField(max_length=255, choices=COMMAND_TYPE, null=False)
+    player = models.ForeignKey(Player, related_name='commands', on_delete=models.CASCADE)
     origin = models.CharField(max_length=255, null=False)
     target = models.CharField(max_length=255, null=False)
     action = models.CharField(max_length=255, null=False)
-    unit = models.ForeignKey(Unit, related_name='units', on_delete=models.DO_NOTHING)
+    unit = models.CharField(max_length=255, null=False)
 
     def __str__(self):
-        return self.origin + self.target + self.action + str(self.soldier)
+        return str(self.origin) + str(self.target) + str(self.action) + str(self.soldier)
 
     def execute(self):
-        print("Teste " + self)
+        if self.action == 'attack':
+            time.sleep(30)
+        elif self.action == 'ambush':
+            time.sleep(50)
+        elif self.action == 'defend':
+            time.sleep(5)
+
+        TelegramApi.getService().sendMessage("relatório de execução", self.player.identifier)
+        print("Teste " + str(self))
+
+    @staticmethod
+    def command_builder(player, message):
+        elements = message.split(' ')
+        command = Command()
+        command.origin = player.territory.fields.filter(name=elements[0]).get()
+        command.target = player.territory.fields.filter(name=elements[1]).get()
+        command.player = player
+        command.unit = elements[2]
+        command.action = elements[3]
+        command.save()
+        return command
 
 
 TRANSMISSION_STATUS = (('C', 'COMPLETED'), ('I', 'INTERCEPTED'), ('T', 'TRANSIT'), ('D', 'DAMAGED'))
@@ -204,11 +226,20 @@ class Interface():
         else:
             return 'What units? ( /enter name_world)'
 
-
     @staticmethod
-    def opponents(self, player):
-        print("dentro")
-
+    def command(identifier, message):
+        player = Player.objects.filter(identifier=identifier).first()
+        if (player and player.territory):
+            if (len(player.territory.players.all()) > 1):
+                command = Command.command_builder(player, message)
+                TheWorld.getTheWorld().addEvent(command)
+                return 'Your command has being sent, master, we shall hope it reaches the right hands!'
+            else:
+                return 'The land of ' + str(player.territory) + ' is in peace, there is no need to worry about enemies.'
+        else:
+            return 'Command who and where? ( /enter world_name )'
+        message.split(" ")
+        command = Command
 
     @staticmethod
     def history(identifier):
