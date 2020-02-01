@@ -4,8 +4,7 @@ from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
-from game.models import Player
-from game.theworld import TheWorld
+from game.models import Player, TheWorld
 from telegramapi.models import TelegramApi
 
 
