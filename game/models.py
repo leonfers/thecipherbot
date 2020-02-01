@@ -5,6 +5,8 @@ from django.db import models, transaction
 from django.contrib.auth.models import User
 
 from .models import *
+
+
 class TheWorld(models.Model):
     world = None
     pool = Pool()
@@ -16,7 +18,7 @@ class TheWorld(models.Model):
     def getTheWorld():
         if (TheWorld.world == None):
             world = TheWorld.objects.all().first()
-            if(world):
+            if (world):
                 TheWorld.world = world
             else:
                 TheWorld.world = TheWorld()
@@ -33,19 +35,7 @@ class TheWorld(models.Model):
             territory.save()
             print('Territorio criado')
 
-        player = TheWorld.getTheWorld().createPlayer(identifier, player_name, territory);
-
-        for i in range(9):
-            field = Field()
-            field.name = str(i) + str(i) + str(i) + str(i)
-            field.territory = territory
-            field.save()
-            print('Field created')
-
-        unit = player.units.first()
-        unit.field = territory.fields.all()[randrange(0, 10, 1)]
-        unit.save()
-        print('Unidade posicionada')
+        TheWorld.getTheWorld().createPlayer(identifier, player_name, territory);
 
     def createPlayer(self, identifier, player_name, territory):
         player = Player.objects.filter(identifier=identifier).first()
@@ -63,13 +53,23 @@ class TheWorld(models.Model):
             unit.save()
             print('Unit created')
 
-            print('Player '+player_name+'created')
+            for i in range(9):
+                field = Field()
+                field.name = str(i) + str(i) + str(i) + str(i)
+                field.territory = territory
+                field.save()
+                print('Field created')
+
+            unit = player.units.first()
+            unit.field = territory.fields.all()[randrange(0, 10, 1)]
+            unit.save()
+            print('Unidade posicionada')
+
+            print('Player ' + player_name + 'created')
         else:
-            print('Player '+player_name+'loaded')
+            print('Player ' + player_name + 'loaded')
 
         return player
-
-
 
 
 class Territory(models.Model):
@@ -88,7 +88,7 @@ class Field(models.Model):
 class Player(models.Model):
     name = models.CharField(max_length=255, null=False)
     identifier = models.IntegerField(null=False)
-    territory = models.ForeignKey(Territory, related_name='players', on_delete=models.CASCADE)
+    territory = models.ForeignKey(Territory, related_name='players', on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.name
@@ -101,7 +101,7 @@ class Unit(models.Model):
     name = models.CharField(max_length=255, null=False)
     category = models.CharField(max_length=255, choices=UNIT_TYPES, null=False)
     field = models.ForeignKey(Field, related_name='units', on_delete=models.CASCADE, null=True)
-    player = models.ForeignKey(Player,related_name='units',on_delete=models.CASCADE)
+    player = models.ForeignKey(Player, related_name='units', on_delete=models.CASCADE)
 
     def action(self):
         pass
@@ -118,7 +118,7 @@ class Command(models.Model):
     origin = models.CharField(max_length=255, null=False)
     target = models.CharField(max_length=255, null=False)
     action = models.CharField(max_length=255, null=False)
-    unit = models.ForeignKey(Unit, related_name='units',on_delete=models.DO_NOTHING)
+    unit = models.ForeignKey(Unit, related_name='units', on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return self.origin + self.target + self.action + str(self.soldier)
@@ -140,7 +140,42 @@ class Transmission(models.Model):
         return str(self.command) + str(self.time_in_minutes) + str(self.status) + str(self.cost)
 
 
-class Message(models.Model):
-    text = models.CharField(max_length=400, null=False)
-    identifier = models.IntegerField(null=False)
-    date = models.DateTimeField()
+class Interface():
+
+    @staticmethod
+    def start(world, identifier, player_name):
+        player = Player.objects.filter(identifier=identifier).first()
+        if player and player.territory is not None:
+            return "You have a kingdom to defend, to not flee to another world!"
+        else:
+            TheWorld.getTheWorld().createTerritory(world, identifier, player_name)
+            return "Might CIO " + player_name + " do your best to defeat our enemies in this " \
+                                                "war of information, repair our kingdom " + player.territory.name + " to prosperity " \
+                                                                                                                    "with your Information Skills! "
+
+    @staticmethod
+    def leave(identifier):
+        player = Player.objects.filter(identifier=identifier).first()
+        if player and player.territory is not None:
+            territory = player.territory
+            player.territory = None
+            player.save()
+            if len(territory.players) == 0:
+                territory.delete()
+                return "Ou hero, may your journey to other counties be amazing, thank you for saving us!"
+            else:
+                return "Coward, we trusted you, know that you will be not missed, we will win this war by ourselves!"
+        else:
+            return "What exactly are you trying to leave?"
+
+    @staticmethod
+    def overview(self, player):
+        print("dentro")
+
+    @staticmethod
+    def opponents(self, player):
+        print("dentro")
+
+    @staticmethod
+    def history(self, player):
+        print("dentro")
