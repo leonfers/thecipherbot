@@ -1,9 +1,10 @@
-from datetime import time
+import time
 from multiprocessing.pool import Pool
 from random import randrange
 
 from django.db import models, transaction
 from django.contrib.auth.models import User
+import threading
 
 from telegramapi.models import TelegramApi
 from .models import *
@@ -11,10 +12,11 @@ from .models import *
 
 class TheWorld(models.Model):
     world = None
-    pool = Pool()
 
-    def addEvent(event):
-        TheWorld.pool.map(event.execute)
+    def addEvent(self, event):
+        t = threading.Thread(target=event.execute, args=[event])
+        t.setDaemon(True)
+        t.start()
 
     @staticmethod
     def getTheWorld():
@@ -133,22 +135,24 @@ class Command(models.Model):
     unit = models.CharField(max_length=255, null=False)
 
     def __str__(self):
-        return str(self.origin) + str(self.target) + str(self.action) + str(self.soldier)
+        return str(self.origin) + str(self.target) + str(self.action) + str(self.unit)
 
-    def execute(self):
-        if self.action == 'attack':
+    @staticmethod
+    def execute(event):
+        if event.action == 'attack':
             time.sleep(30)
-        elif self.action == 'ambush':
+        elif event.action == 'ambush':
             time.sleep(50)
-        elif self.action == 'defend':
+        elif event.action == 'defend':
             time.sleep(5)
 
-        TelegramApi.getService().sendMessage("relatório de execução", self.player.identifier)
-        print("Teste " + str(self))
+        TelegramApi.getService().sendMessage("relatório de execução", event.player.identifier)
+        print("Teste " + str(event))
 
     @staticmethod
     def command_builder(player, message):
         elements = message.split(' ')
+        print(elements)
         command = Command()
         command.origin = player.territory.fields.filter(name=elements[0]).get()
         command.target = player.territory.fields.filter(name=elements[1]).get()
@@ -238,8 +242,6 @@ class Interface():
                 return 'The land of ' + str(player.territory) + ' is in peace, there is no need to worry about enemies.'
         else:
             return 'Command who and where? ( /enter world_name )'
-        message.split(" ")
-        command = Command
 
     @staticmethod
     def history(identifier):
