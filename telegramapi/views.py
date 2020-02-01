@@ -20,17 +20,21 @@ class TelegramUpdate(viewsets.ViewSet):
         try:
             print("------New update from telegram-----")
             command = request.data['message']['text']
-            if '/start' in command:
+            if '/enter' in command:
                 identifier = request.data['message']['chat']['id']
                 if len(request.data['message']['text'].split(" ")) == 1:
-                    message = 'Which world do you wish to fight for?( /start world_name )'
+                    message = 'Which world do you wish to fight for?( /enter world_name )'
                 else:
                     world = request.data['message']['text'].split(" ")[1]
                     player_name = request.data['message']['chat']['username']
-                    message = Interface.start(world, identifier, player_name)
+                    message = Interface.enter(world, identifier, player_name)
             elif '/leave' in command:
                 identifier = request.data['message']['chat']['id']
                 message = Interface.leave(identifier)
+
+            elif '/history' in command:
+                identifier = request.data['message']['chat']['id']
+                message = Interface.history(identifier)
 
             print("------End update from telegram-----")
         except Exception as e:

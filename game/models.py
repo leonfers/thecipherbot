@@ -145,7 +145,7 @@ class Transmission(models.Model):
 class Interface():
 
     @staticmethod
-    def start(world, identifier, player_name):
+    def enter(world, identifier, player_name):
         player = Player.objects.filter(identifier=identifier).first()
         if player and player.territory is not None:
             return "You have a kingdom to defend, do not flee to another world!"
@@ -179,9 +179,18 @@ class Interface():
         print("dentro")
 
     @staticmethod
-    def history(self, player):
-        backgroud = 'The land of ' + player.territory + ' has ' + str(len(player.territory.players.all()))+ 'rulers. \n ' \
-                    'We trust you ' + player.name + ' to protect our good leader from their rivals and repair the damage ' \
-                    'caused by this war. \n' \
-                    ''
-        print("dentro")
+    def history(identifier):
+        player = Player.objects.filter(identifier=identifier).first()
+        if(player and player.territory):
+            if (len(player.territory.players.all()) > 1):
+                return 'The land of ' + str(player.territory)+ ' has ' + str(
+                    len(player.territory.players.all())) + ' rulers. \n' \
+                                                           'We trust you ' + player.name + ' to protect our good leader from their rivals and repair the damage ' \
+                                                                                           'caused by this war. \n\n' \
+                                                                                           'We believe your cunning tactics and masterful manipulation of information can turn the tides of this war and end it ' \
+                                                                                           'once and for all.\n\n' \
+                                                                                           'Uncover the plot of the vilains, by intercepting their commands, repair the information if needed and counter atack their evil plans!'
+            else:
+                return 'The land of ' + str(player.territory) + ' is in peace.'
+        else:
+            return 'History of where? ( /enter world_name )'
