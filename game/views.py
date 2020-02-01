@@ -3,6 +3,8 @@ from rest_framework.response import Response
 
 from game.serializers import CommandSerializer, Command, Profile, ProfileSerializer, SoldierSerializer, Soldier, \
     TransmissionSerializer, Transmission, Message, MessageSerializer
+from game.telegram.telegram_service import sendMessage
+import json
 
 
 class CommandViewset(viewsets.ModelViewSet):
@@ -33,4 +35,6 @@ class MessageViewset(viewsets.ModelViewSet):
 class TelegramUpdate(viewsets.ViewSet):
     def create(self, request, pk=None):
         print(request.data)
+
+        sendMessage(request.data['message']['text'], request.data['message']['chat']['id'])
         return Response(status=status.HTTP_200_OK)
