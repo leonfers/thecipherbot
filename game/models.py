@@ -172,7 +172,9 @@ class Interface():
 
     @staticmethod
     def overview(self, player):
-        print("dentro")
+        category_unit = player.units.all()[0].category
+        over_view = "Mr(s). " + player.name + " you have " + len(player.units.get(category = category_unit)) + " of " + player.units.get(category = category_unit) + " on your territory"
+        print(over_view)
 
     @staticmethod
     def opponents(self, player):
