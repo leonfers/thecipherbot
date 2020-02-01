@@ -3,25 +3,31 @@ from rest_framework import serializers
 from .models import *
 
 
-class PerfilSerializer(serializers.HyperlinkedModelSerializer):
+class ProfileSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Perfil
-        fields = ['url', 'nome']
-    
+        model = Profile
+        fields = ['url', 'name', 'identifier']
 
-class SoldadoSerializer(serializers.HyperlinkedModelSerializer):
+
+class SoldierSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Soldado
-        fields = ['url', 'quantidade']
+        model = Soldier
+        fields = ['url', 'name', 'category']
 
 
-class ComandoSerializer(serializers.HyperlinkedModelSerializer):
+class CommandSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Comando
-        fields = ['url', 'origem', 'destino', 'acao', 'sujeito' ]
+        model = Command
+        fields = ['url', 'origin', 'target', 'action', 'soldier', 'type']
 
 
-class TransporteSerializer(serializers.HyperlinkedModelSerializer):
+class TransmissionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Transporte
-        fields = ['url', 'comando', 'tempo']
+        model = Transmission
+        fields = ['url', 'command', 'time', 'cost']
+
+
+class MessageSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Message
+        fields = ['url', 'text', 'profile', 'date']
