@@ -24,7 +24,7 @@ class Soldier(models.Model):
         return self.name + self.category[1]
 
 
-COMMAND_TYPE = (("F", "FAKE"), ("R", "REAL"))
+COMMAND_TYPE = (('F', 'FAKE'), ('R', 'REAL'))
 
 
 class Command(models.Model):
@@ -38,7 +38,7 @@ class Command(models.Model):
         return self.origin + self.target + self.action + str(self.soldier)
 
 
-TRANSMISSION_STATUS = (('C', 'COMPLETED'), ('I', "INTERCEPTED"), ("T", "TRANSIT"), ("D", "DAMAGED"))
+TRANSMISSION_STATUS = (('C', 'COMPLETED'), ('I', 'INTERCEPTED'), ('T', 'TRANSIT'), ('D', 'DAMAGED'))
 
 
 class Transmission(models.Model):
@@ -53,5 +53,24 @@ class Transmission(models.Model):
 
 class Message(models.Model):
     text = models.CharField(max_length=400, null=False)
-    profile = models.ForeignKey(Profile, null=False, on_delete=models.DO_NOTHING)
+    identifier = models.IntegerField(null=False)
     date = models.DateTimeField()
+
+
+# class TelegramUpdate(models.Model):
+#     update_id = models.IntegerField()
+#
+#
+# class TelegramUser(models.Model):
+#     id = models.IntegerField()
+#     username = models.CharField(max_length=200)
+#
+# class TelegramChat(models.Model):
+#     id = models.IntegerField()
+#
+#
+# class TelegramMessage(models.Model):
+#     message_id = models.IntegerField()
+#     text = models.CharField(max_length=800)
+#     user = models.ForeignKey(TelegramUser, on_delete=models.DO_NOTHING)
+#     chat = models.ForeignKey(TelegramChat, on_delete=models.DO_NOTHING())

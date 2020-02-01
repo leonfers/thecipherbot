@@ -30,4 +30,10 @@ class TransmissionSerializer(serializers.HyperlinkedModelSerializer):
 class MessageSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Message
-        fields = ['url', 'text', 'profile', 'date']
+        fields = ['url', 'text', 'identifier']
+
+class TelegramUpdateSerializer(serializers.Serializer):
+    def validate(self, attrs):
+        text = self.initial_data.__str__()
+        print(text)
+        return True
