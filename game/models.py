@@ -153,7 +153,7 @@ class Interface():
             TheWorld.getTheWorld().createTerritory(world, identifier, player_name)
             return "Might CIO " + player_name + " do your best to defeat our enemies in this " \
                                                 "war of information, repair our kingdom " + world + " to prosperity " \
-                                                                                                                    "with your Information Skills! "
+                                                                                                    "with your Information Skills! "
 
     @staticmethod
     def leave(identifier):
@@ -180,4 +180,8 @@ class Interface():
 
     @staticmethod
     def history(self, player):
+        backgroud = 'The land of ' + player.territory + ' has ' + str(len(player.territory.players.all()))+ 'rulers. \n ' \
+                    'We trust you ' + player.name + ' to protect our good leader from their rivals and repair the damage ' \
+                    'caused by this war. \n' \
+                    ''
         print("dentro")
