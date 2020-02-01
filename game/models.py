@@ -63,7 +63,7 @@ class TheWorld(models.Model):
 
         unit = Unit()
         unit.player = player
-        unit.category = UNIT_TYPES[randrange(0, 1, 1)]
+        unit.category = UNIT_TYPES[randrange(0, 2, 1)]
         unit.field = None
         unit.save()
         print('Unit created')
