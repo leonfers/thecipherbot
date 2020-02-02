@@ -171,11 +171,11 @@ class Command(models.Model):
     @staticmethod
     def execute(event):
         if event.action == 'attack':
-            time.sleep(2)
+            time.sleep(120)
         elif event.action == 'ambush':
-            time.sleep(2)
+            time.sleep(60)
         elif event.action == 'defend':
-            time.sleep(2)
+            time.sleep(180)
 
         player = Player.objects.filter(identifier=event.player.identifier).first()
         origin = player.territory.fields.all().filter(name=event.origin).first()
