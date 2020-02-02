@@ -44,6 +44,9 @@ class TelegramUpdate(viewsets.ViewSet):
                 message = command.replace("/command ","")
                 message = Interface.command(identifier,message)
 
+            elif '/start' in command:
+                identifier = request.data['message']['chat']['id']
+                message = Interface.command(identifier)
 
             print("------End update from telegram-----")
         except Exception as e:

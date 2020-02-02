@@ -190,7 +190,7 @@ class Command(models.Model):
                 unit.battle(enemies.__getitem__(randrange(0, len(enemies), 1)))
             else:
                 TelegramApi.getService().sendMessage(
-                    "I "+str(unit.category)+" moved to new location at" + str(event.target) + " with no problems",
+                    "I "+str(unit.category)+" moved to new location at " + str(event.target) + " with no problems",
                     event.player.identifier)
         else:
             TelegramApi.getService().sendMessage(
@@ -308,6 +308,9 @@ class Interface():
         else:
             return 'History of where? ( /enter world_name )'
 
+    @staticmethod
+    def start(identifier):
+        return 'History of where? ( /enter world_name )'
 
 class Util():
 
