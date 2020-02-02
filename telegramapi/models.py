@@ -1,9 +1,11 @@
 import requests
 
+from gamewar.settings import TELEGRAM_KEY
+
 
 class TelegramApi():
     service = None;
-    bot_url = 'https://api.telegram.org/bot910195128:TELEGRAM_KEY/'
+    bot_url = 'https://api.telegram.org/bot910195128:'+TELEGRAM_KEY+'/'
 
     def sendMessage(self, message, chat_id, reply_markup):
         json = {"text": message, "chat_id": chat_id}
