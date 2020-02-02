@@ -308,6 +308,10 @@ class Interface():
         else:
             return 'History of where? ( /enter world_name )'
 
+    @staticmethod
+    def command_interface():
+        pass
+
 
 class Util():
 

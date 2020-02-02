@@ -20,7 +20,7 @@ class TelegramUpdate(viewsets.ViewSet):
         try:
             print("------New update from telegram-----")
             command = request.data['message']['text']
-            if '/enter' in command:
+            if 'enter' == command:
                 identifier = request.data['message']['chat']['id']
                 if len(request.data['message']['text'].split(" ")) == 1:
                     message = 'Which world do you wish to fight for?( /enter world_name )'
@@ -28,27 +28,31 @@ class TelegramUpdate(viewsets.ViewSet):
                     world = request.data['message']['text'].split(" ")[1]
                     player_name = request.data['message']['chat']['username']
                     message = Interface.enter(world, identifier, player_name)
-            elif '/leave' in command:
+
+            elif 'leave' == command:
                 identifier = request.data['message']['chat']['id']
                 message = Interface.leave(identifier)
 
-            elif '/history' in command:
+            elif 'history' == command:
                 identifier = request.data['message']['chat']['id']
                 message = Interface.history(identifier)
 
-            elif '/overview' in command:
+            elif 'overview' == command:
                 identifier = request.data['message']['chat']['id']
                 message = Interface.overview(identifier)
-            elif '/command' in command:
-                identifier = request.data['message']['chat']['id']
-                message = command.replace("/command ","")
-                message = Interface.command(identifier,message)
 
+            elif 'command' == command:
+                identifier = request.data['message']['chat']['id']
+                message = Interface.command_interface(identifier, message)
+
+            elif 'T':
+                message = command.replace("/command ", "")
+                message = Interface.command(identifier, message)
 
             print("------End update from telegram-----")
         except Exception as e:
             print('MORREU')
             print(e)
         if (identifier):
-            self.telegram.sendMessage(message, identifier)
+            self.telegram.sendMessage(message, identifier, TelegramApi.buildReplyMarkup())
         return Response(status=status.HTTP_200_OK)
