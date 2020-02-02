@@ -68,12 +68,13 @@ class TheWorld(models.Model):
         unit = Unit()
         unit.player = player
         unit.category = UNIT_TYPES[randrange(0, 2, 1)]
+        unit.current_action = ACTIONS[randrange(0, 3, 1)]
         unit.field = None
         unit.save()
         print('Unit created')
 
         unit = player.units.first()
-        unit.field = territory.fields.all()[randrange(0, 10, 1)]
+        unit.field = territory.fields.all()[randrange(0, 9, 1)]
         unit.save()
         print('Unidade posicionada')
 
@@ -98,6 +99,9 @@ class Field(models.Model):
     name = models.CharField(max_length=255, null=False)
     territory = models.ForeignKey(Territory, related_name='fields', on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.name
+
 
 class Player(models.Model):
     name = models.CharField(max_length=255, null=False)
@@ -116,9 +120,36 @@ class Unit(models.Model):
     category = models.CharField(max_length=255, null=False)
     field = models.ForeignKey(Field, related_name='units', on_delete=models.CASCADE, null=True)
     player = models.ForeignKey(Player, related_name='units', on_delete=models.CASCADE)
+    current_action = models.CharField(max_length=255, null=False)
 
-    def action(self):
-        pass
+    def battle(self, enemy_unit):
+        print(enemy_unit.current_action)
+        print(self.current_action)
+        if enemy_unit.current_action == self.current_action:
+            TelegramApi.getService().sendMessage("S.O.S enemy spoted at " + self.field.name + " send backup!",
+                                    self.player.identifier)
+            TelegramApi.getService().sendMessage("S.O.S i am under siege at " + enemy_unit.field.name + " send backup!",
+                                    enemy_unit.player.identifier)
+        elif Util.winning_action(self.current_action , enemy_unit.current_action):
+            print("Ganhou quem atacou!")
+            if len(enemy_unit.player.units.all()) < 2:
+                enemy_unit.delete()
+                TelegramApi.getService().sendMessage(
+                    "You lost the war useless CIO, go back to where you came from!",
+                    enemy_unit.player.identifier)
+            else:
+                enemy_unit.delete()
+
+            TelegramApi.getService().sendMessage("Enemy eliminated at " + self.field.name + ", job done!",
+                                    self.player.identifier)
+        else:
+            print("Ganhou quem defende!")
+            TelegramApi.getService().sendMessage(
+                "Invader eliminated at " + enemy_unit.field.name + ", I hope they keep sending more!",
+                enemy_unit.player.identifier)
+            self.delete()
+
+
 
     def __str__(self):
         return self.category
@@ -140,14 +171,31 @@ class Command(models.Model):
     @staticmethod
     def execute(event):
         if event.action == 'attack':
-            time.sleep(30)
+            time.sleep(2)
         elif event.action == 'ambush':
-            time.sleep(50)
+            time.sleep(2)
         elif event.action == 'defend':
-            time.sleep(5)
+            time.sleep(2)
 
-        TelegramApi.getService().sendMessage("relatório de execução", event.player.identifier)
-        print("Teste " + str(event))
+        player = Player.objects.filter(identifier=event.player.identifier).first()
+        origin = player.territory.fields.all().filter(name=event.origin).first()
+        unit = origin.units.all().filter(category=event.unit).first()
+        if unit:
+            target = player.territory.fields.filter(name=event.target).first()
+            enemies = Util.filter_enemies(player, target.units.all())
+            unit.field = target
+            unit.current_action = event.action
+            unit.save()
+            if(len(enemies)>0):
+                unit.battle(enemies.__getitem__(randrange(0, len(enemies), 1)))
+            else:
+                TelegramApi.getService().sendMessage(
+                    "I "+str(unit.category)+" moved to new location at" + str(event.target) + " with no problems",
+                    event.player.identifier)
+        else:
+            TelegramApi.getService().sendMessage(
+                "There is no one to carry on the orders here at " + str(event.origin) + " , did something happen?",
+                event.player.identifier)
 
     @staticmethod
     def command_builder(player, message):
@@ -215,7 +263,7 @@ class Interface():
             overview = "Mr(s). " + player.name + " you have : "
             units = player.units.all()
             for unit in units:
-                overview += '\n an allied ' + str(unit) + ' at ' + unit.field.name
+                overview += '\n an allied ' + str(unit) + ' at ' + unit.field.name + ' on '+unit.current_action+' position \n'
 
             enemy_units = Unit.objects.all();
             enemy_units_same_territory = []
@@ -259,3 +307,29 @@ class Interface():
                 return 'The land of ' + str(player.territory) + ' is in peace.'
         else:
             return 'History of where? ( /enter world_name )'
+
+
+class Util():
+
+    @staticmethod
+    def filter_enemies(player, units):
+        enemy = []
+        for unit in units:
+            if (unit.player != player):
+                enemy.append(unit)
+        return enemy
+
+    @staticmethod
+    def winning_action(action, action_enemy):
+        if (action == 'attack' and action_enemy == 'ambush'):
+            return True
+        elif (action == 'attack' and action_enemy == 'defend'):
+            return False
+        elif (action == 'ambush' and action_enemy == 'attack'):
+            return False
+        elif (action == 'ambush' and action_enemy == 'defend'):
+            return True
+        elif (action == 'defend' and action_enemy == 'attack'):
+            return False
+        elif (action == 'defend' and action_enemy == 'ambush'):
+            return False
