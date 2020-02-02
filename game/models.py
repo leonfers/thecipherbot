@@ -311,6 +311,9 @@ class Interface():
     @staticmethod
     def start(identifier):
         return 'History of where? ( /enter world_name )'
+    def command_interface():
+        pass
+
 
 class Util():
 
