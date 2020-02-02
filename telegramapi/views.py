@@ -19,6 +19,7 @@ class TelegramUpdate(viewsets.ViewSet):
         message = None
         identifier = None
         try:
+            request.data['message']['text'] = request.data['message']['text'].lower()
             command = request.data['message']['text']
             if 'enter' in command:
                 identifier = request.data['message']['chat']['id']
@@ -54,6 +55,10 @@ class TelegramUpdate(viewsets.ViewSet):
                 identifier = request.data['message']['chat']['id']
                 message = Interface.start()
                 self.telegram.sendMessage(message, identifier, TelegramApi.buildReplyMarkup())
+                return Response(status=status.HTTP_200_OK)
+            elif 'help' in command:
+                identifier = request.data['message']['chat']['id']
+                self.telegram.sendMessage('Choose a option', identifier, TelegramApi.buildReplyMarkup())
                 return Response(status=status.HTTP_200_OK)
             else:
                 identifier = request.data['message']['chat']['id']

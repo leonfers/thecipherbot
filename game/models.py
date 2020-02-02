@@ -100,7 +100,7 @@ class Territory(models.Model):
         return str(self.name)
 
 
-CITIES = ['Dadon', 'Tila', 'Ekasa', 'Oreford', 'Mudale', 'Hale', 'Jumond', 'Lore', 'Erysa']
+CITIES = ['dadon', 'tila', 'ekasa', 'oreford', 'mudale', 'hale', 'jumond', 'lore', 'erysa']
 
 
 class Field(models.Model):
