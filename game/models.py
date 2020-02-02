@@ -311,14 +311,19 @@ class Interface():
     @staticmethod
     def start():
         return "In this game, each player enters a realm with a certain number of units (pawns and spies). When more than one player \
-        enters the same kingdom, they battle each other to defend the kingdom. The objective of the game is to capture the enemy's \
+        enters the same kingdom, they battle each other over the kingdom.\n The objective of the game is to capture the enemy's \
         messages, decrypt them and use this information to move your troops and defeat all enemy troops. Troops can be moved with three\
-         statuses: attack, ambush and defend. \nAttack wins by ambushing. \nDefending wins from attacking. \nambush wins from defending.\
-          In the event of a tie, both sides are notified of the tie and must make some move. \nBy defeating all units of all enemies, the\
-           kingdom will again be at peace."
-    
-    # def command_interface():
-    #     pass
+         actions: attack, ambush and defend. \n\nAttacking wins ambushing. \nDefending wins from attacking. \nambush wins from defending.\n\n\
+          In the event of a tie, both sides are notified of the tie and must make a move. \nBy defeating all units of all enemies, the\
+           kingdom will repair it\'s peace."
+
+    @staticmethod
+    def command_interface():
+        return "To command your units use the following estructure: \n\n" \
+               "<action> <target> with <unit> from <unit\'s origin> \n\n" \
+               "An example would be:\n \"attack london with spy from atenas\"" \
+               "\n or \n" \
+               "\"defend london with pawn from london\""
 
 
 class Util():
