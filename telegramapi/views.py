@@ -19,7 +19,6 @@ class TelegramUpdate(viewsets.ViewSet):
         message = None
         identifier = None
         try:
-            print("------New update from telegram-----")
             command = request.data['message']['text']
             if 'enter' in command:
                 identifier = request.data['message']['chat']['id']
@@ -59,11 +58,8 @@ class TelegramUpdate(viewsets.ViewSet):
             else:
                 identifier = request.data['message']['chat']['id']
                 message = 'Sorry CIO, but  don\'t get what are you saying? (' + command + ')'
-
-            print("------End update from telegram-----")
         except Exception as e:
-            message = 'Sorry CIO, but something happends and i could do nothing about it!'
-            print('MORREU de ', e)
+            message = 'Something unexpected happened, please check you realm and try again!'
         if (identifier):
             self.telegram.sendMessage(message, identifier, TelegramApi.buildReplyMarkup())
         return Response(status=status.HTTP_200_OK)

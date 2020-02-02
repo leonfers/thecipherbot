@@ -14,7 +14,6 @@ class TheWorld(models.Model):
     world = None
 
     def addEvent(self, event):
-        print("New event to te world!")
         t = threading.Thread(target=event.execute, args=[event])
         t.setDaemon(True)
         t.start()
@@ -44,9 +43,6 @@ class TheWorld(models.Model):
                 field.name = CITIES[i]
                 field.territory = territory
                 field.save()
-                print('Field created')
-
-            print('Territorio criado')
 
         return TheWorld.getTheWorld().createPlayer(identifier, player_name, territory);
 
@@ -62,10 +58,6 @@ class TheWorld(models.Model):
             player.name = player_name
             player.territory = territory
             player.save()
-
-            print('Player ' + player_name + 'created')
-        else:
-            print('Player ' + player_name + 'loaded')
 
         for unit in player.units.all():
             unit.delete()
@@ -91,18 +83,12 @@ class TheWorld(models.Model):
         unit.field = None
         unit.save()
 
-        print('Units created')
-
         units = player.units.all()
         for u in units:
             u.field = territory.fields.all()[randrange(0, 9, 1)]
             u.save()
-            print('Unidade posicionada')
-
-
         player.territory = territory
         player.save()
-
         return player
 
 
@@ -196,8 +182,6 @@ class Unit(models.Model):
 
 
         else:
-            print("Ganhou quem defende!")
-
             if (enemy_unit.category == 'spy'):
                 TelegramApi.getService().sendMessage(
                     "S.O.S enemy spoted at " + self.field.name + "at position of " + self.current_action + " send backup,!",
@@ -231,7 +215,7 @@ class Command(models.Model):
         for p in player.territory.players.all():
             if (p != player):
                 message = str(event).split(' ')
-                TelegramApi.getService().sendMessage('Interceptamos uma mensagem, CIO \n' +
+                TelegramApi.getService().sendMessage('Message intercepted, CIO \n' +
                                                      player.cipher.encrypt(str(player.name)) + ': '
                                                      + player.cipher.encrypt(message[0]) +
                                                      ' '
@@ -271,7 +255,6 @@ class Command(models.Model):
 
     @staticmethod
     def command_builder(player, message):
-        print("Entrou comando builder")
         elements = message.split(' ')
         print(elements)
         command = Command()
