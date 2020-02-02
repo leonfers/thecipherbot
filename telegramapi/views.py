@@ -45,10 +45,11 @@ class TelegramUpdate(viewsets.ViewSet):
                 identifier = request.data['message']['chat']['id']
                 message = Interface.command_interface(identifier, message)
 
-            elif 'T':
-                message = command.replace("/command ", "")
-                message = Interface.command(identifier, message)
-
+            elif command.match(
+                    r'(\battack|defend|ambush\b) (\b([^\s]+)\b) (\bwith\b) (\bspy|peon\b) (\bfrom\b) (\b([^\s]+)\b)'):
+                message = Interface.command(identifier, command)
+            else:
+                message = 'Sorry general, but  don\'t get what are you saying? (' + command + ')'
             print("------End update from telegram-----")
         except Exception as e:
             print('MORREU')

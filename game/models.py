@@ -202,11 +202,11 @@ class Command(models.Model):
         elements = message.split(' ')
         print(elements)
         command = Command()
-        command.origin = player.territory.fields.filter(name=elements[0]).get()
+        command.origin = player.territory.fields.filter(name=elements[5]).get()
         command.target = player.territory.fields.filter(name=elements[1]).get()
         command.player = player
-        command.unit = elements[2]
-        command.action = elements[3]
+        command.unit = elements[3]
+        command.action = elements[0]
         command.save()
         return command
 
