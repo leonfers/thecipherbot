@@ -14,6 +14,7 @@ class TheWorld(models.Model):
     world = None
 
     def addEvent(self, event):
+        print("New event to te world!")
         t = threading.Thread(target=event.execute, args=[event])
         t.setDaemon(True)
         t.start()
@@ -127,29 +128,27 @@ class Unit(models.Model):
         print(self.current_action)
         if enemy_unit.current_action == self.current_action:
             TelegramApi.getService().sendMessage("S.O.S enemy spoted at " + self.field.name + " send backup!",
-                                    self.player.identifier)
+                                                 self.player.identifier,TelegramApi.buildReplyMarkup())
             TelegramApi.getService().sendMessage("S.O.S i am under siege at " + enemy_unit.field.name + " send backup!",
-                                    enemy_unit.player.identifier)
-        elif Util.winning_action(self.current_action , enemy_unit.current_action):
+                                                 enemy_unit.player.identifier,TelegramApi.buildReplyMarkup())
+        elif Util.winning_action(self.current_action, enemy_unit.current_action):
             print("Ganhou quem atacou!")
             if len(enemy_unit.player.units.all()) < 2:
                 enemy_unit.delete()
                 TelegramApi.getService().sendMessage(
                     "You lost the war useless CIO, go back to where you came from!",
-                    enemy_unit.player.identifier)
+                    enemy_unit.player.identifier,TelegramApi.buildReplyMarkup())
             else:
                 enemy_unit.delete()
 
             TelegramApi.getService().sendMessage("Enemy eliminated at " + self.field.name + ", job done!",
-                                    self.player.identifier)
+                                                 self.player.identifier,TelegramApi.buildReplyMarkup())
         else:
             print("Ganhou quem defende!")
             TelegramApi.getService().sendMessage(
                 "Invader eliminated at " + enemy_unit.field.name + ", I hope they keep sending more!",
-                enemy_unit.player.identifier)
+                enemy_unit.player.identifier,TelegramApi.buildReplyMarkup())
             self.delete()
-
-
 
     def __str__(self):
         return self.category
@@ -171,11 +170,11 @@ class Command(models.Model):
     @staticmethod
     def execute(event):
         if event.action == 'attack':
-            time.sleep(120)
+            time.sleep(5)
         elif event.action == 'ambush':
-            time.sleep(60)
+            time.sleep(10)
         elif event.action == 'defend':
-            time.sleep(180)
+            time.sleep(15)
 
         player = Player.objects.filter(identifier=event.player.identifier).first()
         origin = player.territory.fields.all().filter(name=event.origin).first()
@@ -186,19 +185,20 @@ class Command(models.Model):
             unit.field = target
             unit.current_action = event.action
             unit.save()
-            if(len(enemies)>0):
+            if (len(enemies) > 0):
                 unit.battle(enemies.__getitem__(randrange(0, len(enemies), 1)))
             else:
                 TelegramApi.getService().sendMessage(
-                    "I "+str(unit.category)+" moved to new location at " + str(event.target) + " with no problems",
-                    event.player.identifier)
+                    "I " + str(unit.category) + " moved to new location at " + str(event.target) + " with no problems",
+                    event.player.identifier,TelegramApi.buildReplyMarkup())
         else:
             TelegramApi.getService().sendMessage(
                 "There is no one to carry on the orders here at " + str(event.origin) + " , did something happen?",
-                event.player.identifier)
+                event.player.identifier,TelegramApi.buildReplyMarkup())
 
     @staticmethod
     def command_builder(player, message):
+        print("Entrou comando builder")
         elements = message.split(' ')
         print(elements)
         command = Command()
@@ -248,7 +248,7 @@ class Interface():
                 territory.delete()
                 for unit in player.units.all():
                     unit.delete()
-                return "Our hero, may your journey to other counties be amazing, thank you for saving us!"
+                return "Our hero, may your journey to other realms be amazing, thank you for saving us!"
             else:
                 for unit in player.units.all():
                     unit.delete()
@@ -260,23 +260,37 @@ class Interface():
     def overview(identifier):
         player = Player.objects.filter(identifier=identifier).first()
         if player and len(player.units.all()) > 0:
-            overview = "Mr(s). " + player.name + " you have : "
+            overview = "Mr(s). " + player.name + ", in the realm of "+str(player.territory)+" you have : "
             units = player.units.all()
             for unit in units:
-                overview += '\n an allied ' + str(unit) + ' at ' + unit.field.name + ' on '+unit.current_action+' position \n'
+                overview += '\n\nan allied ' + str(
+                    unit) + ' at ' + unit.field.name + ' on ' + unit.current_action + ' position \n'
 
             enemy_units = Unit.objects.all();
             enemy_units_same_territory = []
             for unit in enemy_units:
                 if (unit.player.territory == player.territory):
                     enemy_units_same_territory.append(unit)
-            overview += '\n\nYou are up against ' + str(
+            overview += '\nYou are up against ' + str(
                 len(Player.objects.filter(territory=player.territory).all()) - 1) + ' rivals.\n' \
                                                                                     'There are ' + str(
-                len(enemy_units_same_territory) - len(player.units.all())) + ' enemy units left in the war.'
+                len(enemy_units_same_territory) - len(player.units.all())) + ' enemy units left in the war.' \
+                                                                             '\nCities: '+(str(CITIES)).replace("\'","")
             return overview
         else:
-            return 'What units? ( /enter name_world)'
+            overview = "Mr(s). " + player.name + ", in the realm of " + str(player.territory) + " you have no one to help you, you should flee!"
+            enemy_units = Unit.objects.all();
+            enemy_units_same_territory = []
+            for unit in enemy_units:
+                if (unit.player.territory == player.territory):
+                    enemy_units_same_territory.append(unit)
+            overview += '\nYou are up against ' + str(
+                len(Player.objects.filter(territory=player.territory).all()) - 1) + ' rivals.\n' \
+                                                                                    'There are ' + str(
+                len(enemy_units_same_territory)) + ' enemy units left in the war.' \
+                                                                             '\nCities: ' + (str(CITIES)).replace("\'",
+                                                                                                                   "")
+            return overview
 
     @staticmethod
     def command(identifier, message):
@@ -289,14 +303,14 @@ class Interface():
             else:
                 return 'The land of ' + str(player.territory) + ' is in peace, there is no need to worry about enemies.'
         else:
-            return 'Command who and where? ( /enter world_name )'
+            return 'Command who and where? ( enter world_name )'
 
     @staticmethod
     def history(identifier):
         player = Player.objects.filter(identifier=identifier).first()
         if (player and player.territory):
             if (len(player.territory.players.all()) > 1):
-                return 'The land of ' + str(player.territory) + ' has ' + str(
+                return 'The realm of ' + str(player.territory) + ' has ' + str(
                     len(player.territory.players.all())) + ' rulers. \n' \
                                                            'We trust you ' + player.name + ' to protect our good leader from their rivals and repair the damage ' \
                                                                                            'caused by this war. \n\n' \
@@ -306,24 +320,29 @@ class Interface():
             else:
                 return 'The land of ' + str(player.territory) + ' is in peace.'
         else:
-            return 'History of where? ( /enter world_name )'
+            return 'History of where? ( enter world_name )'
 
     @staticmethod
     def start():
-        return "In this game, each player enters a realm with a certain number of units (warriors and spies). When more than one player \
-        enters the same kingdom, they battle each other over the kingdom.\n The objective of the game is to capture the enemy's \
-        messages, decrypt them and use this information to move your troops and defeat all enemy troops. Troops can be moved with three \
-        actions: attack, ambush and defend. \n\nAttacking wins ambushing. \nDefending wins from attacking. \nambush wins from defending.\n\n\
-        In the event of a tie, both sides are notified of the tie and must make a move. \nBy defeating all units of all enemies, the \
-        kingdom will repair it\'s peace."
+        return "In this game, each player enters a realm with a certain number of units (warriors and spies). When more than one player " \
+               "enters the same kingdom, they battle each other over the kingdom.\nThe objective of the game is to defeat all enemy troops.\nTroops can be moved with three " \
+               "actions:\n\n attack, ambush and defend \n\nAttacking wins ambushing.\nAmbushing wins defending.\nDefending wins attacking.\n\n" \
+               "You can intercept enemy messages and repair it\'s contents to launch counter attacks!" \
+               "\nBy defeating all enemies, you will " \
+               "repair the kingdom\'s peace."
+
+    @staticmethod
+    def enter_help():
+        return "To enter a world type: enter world_name" \
+               "\n like: \n" \
+               "enter Narnia "
 
     @staticmethod
     def command_interface():
-        return "To command your units use the following structure: \n\n" \
-               "<action> <target> with <unit> from <unit\'s origin> \n\n" \
-               "An example would be:\n \"attack Dadon with spy from Tila\"" \
-               "\n or \n" \
-               "\"defend Jumond with warrior from Jumond\""
+        return "To command your units use the following structure:\n\n" \
+               "<action> <target> with <unit> from <unit\'s origin>\n\n" \
+               "An example would be:"\
+               "\ndefend Jumond with warrior from Jumond"
 
 
 class Util():

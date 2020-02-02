@@ -21,10 +21,10 @@ class TelegramUpdate(viewsets.ViewSet):
         try:
             print("------New update from telegram-----")
             command = request.data['message']['text']
-            if 'enter' == command:
+            if 'enter' in command:
                 identifier = request.data['message']['chat']['id']
                 if len(request.data['message']['text'].split(" ")) == 1:
-                    message = 'Which world do you wish to fight for?( /enter world_name )'
+                    message = Interface.enter_help()
                 else:
                     world = request.data['message']['text'].split(" ")[1]
                     player_name = request.data['message']['chat']['username']
@@ -41,25 +41,28 @@ class TelegramUpdate(viewsets.ViewSet):
             elif 'overview' == command:
                 identifier = request.data['message']['chat']['id']
                 message = Interface.overview(identifier)
-
             elif 'command' == command:
                 identifier = request.data['message']['chat']['id']
                 message = Interface.command_interface()
-                self.telegram.sendMessage(message, identifier, None)
+                self.telegram.sendMessage(message, identifier, TelegramApi.buildReplyOverMarkup())
                 return Response(status=status.HTTP_200_OK)
             elif re.match(
-                    r'(\battack|defend|ambush\b) (\b([^\s]+)\b) (\bwith\b) (\bspy|peon\b) (\bfrom\b) (\b([^\s]+)\b)',
+                    r'(\battack|defend|ambush\b) (\b([^\s]+)\b) (\bwith\b) (\bspy|warrior\b) (\bfrom\b) (\b([^\s]+)\b)',
                     command):
-                print('entrou')
+                identifier = request.data['message']['chat']['id']
                 message = Interface.command(identifier, command)
             elif 'start' in command:
                 identifier = request.data['message']['chat']['id']
                 message = Interface.start()
+                self.telegram.sendMessage(message, identifier, TelegramApi.buildReplyMarkup())
+                return Response(status=status.HTTP_200_OK)
             else:
+                identifier = request.data['message']['chat']['id']
                 message = 'Sorry CIO, but  don\'t get what are you saying? (' + command + ')'
 
             print("------End update from telegram-----")
         except Exception as e:
+            message = 'Sorry CIO, but something happends and i could do nothing about it!'
             print('MORREU de ', e)
         if (identifier):
             self.telegram.sendMessage(message, identifier, TelegramApi.buildReplyMarkup())
