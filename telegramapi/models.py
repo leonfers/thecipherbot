@@ -3,7 +3,7 @@ import requests
 
 class TelegramApi():
     service = None;
-    bot_url = 'https://api.telegram.org/bot910195128:AAHacOdlZmh2kjNpc337RsN1KZci-ISk624/'
+    bot_url = 'https://api.telegram.org/bot910195128:TELEGRAM_KEY/'
 
     def sendMessage(self, message, chat_id, reply_markup):
         json = {"text": message, "chat_id": chat_id}
