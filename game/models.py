@@ -72,16 +72,33 @@ class TheWorld(models.Model):
 
         unit = Unit()
         unit.player = player
-        unit.category = UNIT_TYPES[randrange(0, 2, 1)]
+        unit.category = 'spy'
         unit.current_action = ACTIONS[randrange(0, 3, 1)]
         unit.field = None
         unit.save()
-        print('Unit created')
 
-        unit = player.units.first()
-        unit.field = territory.fields.all()[randrange(0, 9, 1)]
+        unit = Unit()
+        unit.player = player
+        unit.category = 'warrior'
+        unit.current_action = ACTIONS[randrange(0, 3, 1)]
+        unit.field = None
         unit.save()
-        print('Unidade posicionada')
+
+        unit = Unit()
+        unit.player = player
+        unit.category = 'warrior'
+        unit.current_action = ACTIONS[randrange(0, 3, 1)]
+        unit.field = None
+        unit.save()
+
+        print('Units created')
+
+        units = player.units.all()
+        for u in units:
+            u.field = territory.fields.all()[randrange(0, 9, 1)]
+            u.save()
+            print('Unidade posicionada')
+
 
         player.territory = territory
         player.save()
@@ -149,28 +166,47 @@ class Unit(models.Model):
         print(enemy_unit.current_action)
         print(self.current_action)
         if enemy_unit.current_action == self.current_action:
-            TelegramApi.getService().sendMessage("S.O.S enemy spoted at " + self.field.name + " send backup!",
-                                                 self.player.identifier, TelegramApi.buildReplyMarkup())
-            TelegramApi.getService().sendMessage("S.O.S i am under siege at " + enemy_unit.field.name + " send backup!",
-                                                 enemy_unit.player.identifier, TelegramApi.buildReplyMarkup())
-        elif Util.winning_action(self.current_action, enemy_unit.current_action):
-            print("Ganhou quem atacou!")
-            if len(enemy_unit.player.units.all()) < 2:
-                enemy_unit.delete()
+            if (self.category == 'spy'):
                 TelegramApi.getService().sendMessage(
-                    "You lost the war useless CIO, go back to where you came from!",
-                    enemy_unit.player.identifier, TelegramApi.buildReplyMarkup())
+                    "S.O.S enemy spoted at " + self.field.name + "at position of " + enemy_unit.current_action + " send backup!",
+                    self.player.identifier, TelegramApi.buildReplyMarkup())
             else:
-                enemy_unit.delete()
+                TelegramApi.getService().sendMessage("S.O.S enemy spoted at " + self.field.name + " send backup!",
+                                                     self.player.identifier, TelegramApi.buildReplyMarkup())
+                TelegramApi.getService().sendMessage(
+                    "S.O.S i am under siege at " + enemy_unit.field.name + " send backup!",
+                    enemy_unit.player.identifier, TelegramApi.buildReplyMarkup())
+        elif Util.winning_action(self.current_action, enemy_unit.current_action):
+            if (self.category == 'spy'):
+                TelegramApi.getService().sendMessage(
+                    "S.O.S enemy spoted at " + self.field.name + "at position of " + enemy_unit.current_action + " send backup,!",
+                    self.player.identifier, TelegramApi.buildReplyMarkup())
+            else:
+                if len(enemy_unit.player.units.all()) < 2:
+                    enemy_unit.delete()
+                    TelegramApi.getService().sendMessage(
+                        "You lost the war useless CIO, go back to where you came from!",
+                        enemy_unit.player.identifier, TelegramApi.buildReplyMarkup())
+                    TelegramApi.getService().sendMessage("Enemy eliminated at " + self.field.name + ", job done!",
+                                                         self.player.identifier, TelegramApi.buildReplyMarkup())
+                else:
+                    enemy_unit.delete()
+                    TelegramApi.getService().sendMessage("Enemy eliminated at " + self.field.name + ", job done!",
+                                                         self.player.identifier, TelegramApi.buildReplyMarkup())
 
-            TelegramApi.getService().sendMessage("Enemy eliminated at " + self.field.name + ", job done!",
-                                                 self.player.identifier, TelegramApi.buildReplyMarkup())
+
         else:
             print("Ganhou quem defende!")
-            TelegramApi.getService().sendMessage(
-                "Invader eliminated at " + enemy_unit.field.name + ", I hope they keep sending more!",
-                enemy_unit.player.identifier, TelegramApi.buildReplyMarkup())
-            self.delete()
+
+            if (enemy_unit.category == 'spy'):
+                TelegramApi.getService().sendMessage(
+                    "S.O.S enemy spoted at " + self.field.name + "at position of " + self.current_action + " send backup,!",
+                    enemy_unit.player.identifier, TelegramApi.buildReplyMarkup())
+            else:
+                TelegramApi.getService().sendMessage(
+                    "Invader eliminated at " + enemy_unit.field.name + ", I hope they keep sending more!",
+                    enemy_unit.player.identifier, TelegramApi.buildReplyMarkup())
+                self.delete()
 
     def __str__(self):
         return self.category
@@ -248,19 +284,6 @@ class Command(models.Model):
         return command
 
 
-# TRANSMISSION_STATUS = (('C', 'COMPLETED'), ('I', 'INTERCEPTED'), ('T', 'TRANSIT'), ('D', 'DAMAGED'))
-#
-#
-# class Transmission(models.Model):
-#     command = models.OneToOneField('Command', on_delete=models.DO_NOTHING)
-#     time_in_minutes = models.IntegerField(null=False)
-#     status = models.CharField(max_length=255, choices=TRANSMISSION_STATUS, null=False)
-#     cost = models.IntegerField(null=False)
-#
-#     def __str__(self):
-#         return str(self.command) + str(self.time_in_minutes) + str(self.status) + str(self.cost)
-
-
 class Interface():
 
     @staticmethod
@@ -297,10 +320,10 @@ class Interface():
     def overview(identifier):
         player = Player.objects.filter(identifier=identifier).first()
         if player and len(player.units.all()) > 0:
-            overview = "Mr(s). " + player.name + ", in the realm of " + str(player.territory) + " you have : "
+            overview = "Mr(s). " + player.name + ", in the realm of " + str(player.territory) + " you have : \n\n"
             units = player.units.all()
             for unit in units:
-                overview += '\n\nan allied ' + str(
+                overview += 'an allied ' + str(
                     unit) + ' at ' + unit.field.name + ' on ' + unit.current_action + ' position \n'
 
             enemy_units = Unit.objects.all();
