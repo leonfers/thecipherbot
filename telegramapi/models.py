@@ -19,6 +19,6 @@ class TelegramApi():
 
     @staticmethod
     def buildReplyMarkup():
-        reply_markup = {"keyboard": [[{'text':'*enter*'}], [{'text':'overview'}], [{'text':'history'}], [{'text':'command'}], [{'text':'leave'}]],
+        reply_markup = {"keyboard": [[{'text':'enter'}], [{'text':'overview'}], [{'text':'history'}], [{'text':'command'}], [{'text':'leave'}]],
                         'one_time_keyboard': True}
         return reply_markup

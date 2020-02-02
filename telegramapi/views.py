@@ -8,6 +8,7 @@ from rest_framework.response import Response
 
 from game.models import Player, TheWorld, Interface
 from telegramapi.models import TelegramApi
+import re
 
 
 class TelegramUpdate(viewsets.ViewSet):
@@ -43,10 +44,13 @@ class TelegramUpdate(viewsets.ViewSet):
 
             elif 'command' == command:
                 identifier = request.data['message']['chat']['id']
-                message = Interface.command_interface(identifier, message)
+                message = Interface.command_interface()
+                self.telegram.sendMessage(message, identifier, None)
                 return Response(status=status.HTTP_200_OK)
-            elif command.match(
-                    r'(\battack|defend|ambush\b) (\b([^\s]+)\b) (\bwith\b) (\bspy|peon\b) (\bfrom\b) (\b([^\s]+)\b)'):
+            elif re.match(
+                    r'(\battack|defend|ambush\b) (\b([^\s]+)\b) (\bwith\b) (\bspy|peon\b) (\bfrom\b) (\b([^\s]+)\b)',
+                    command):
+                print('entrou')
                 message = Interface.command(identifier, command)
             elif 'start' in command:
                 identifier = request.data['message']['chat']['id']
@@ -56,8 +60,7 @@ class TelegramUpdate(viewsets.ViewSet):
 
             print("------End update from telegram-----")
         except Exception as e:
-            print('MORREU')
-            print(e)
+            print('MORREU de ', e)
         if (identifier):
             self.telegram.sendMessage(message, identifier, TelegramApi.buildReplyMarkup())
         return Response(status=status.HTTP_200_OK)

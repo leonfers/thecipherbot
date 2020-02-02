@@ -92,7 +92,7 @@ class Territory(models.Model):
         return str(self.name)
 
 
-CITIES = ['sparta', 'atenas', 'teresina', 'rio', 'cairo', 'persia', 'nilo', 'japao', 'londres']
+CITIES = ['Dadon', 'Tila', 'Ekasa', 'Oreford', 'Mudale', 'Hale', 'Jumond', 'Lore', 'Erysa']
 
 
 class Field(models.Model):
@@ -112,7 +112,7 @@ class Player(models.Model):
         return self.name
 
 
-UNIT_TYPES = ['Peon', 'Spy']
+UNIT_TYPES = ['warrior', 'spy']
 
 
 class Unit(models.Model):
@@ -310,20 +310,20 @@ class Interface():
 
     @staticmethod
     def start():
-        return "In this game, each player enters a realm with a certain number of units (pawns and spies). When more than one player \
+        return "In this game, each player enters a realm with a certain number of units (warriors and spies). When more than one player \
         enters the same kingdom, they battle each other over the kingdom.\n The objective of the game is to capture the enemy's \
-        messages, decrypt them and use this information to move your troops and defeat all enemy troops. Troops can be moved with three\
-         actions: attack, ambush and defend. \n\nAttacking wins ambushing. \nDefending wins from attacking. \nambush wins from defending.\n\n\
-          In the event of a tie, both sides are notified of the tie and must make a move. \nBy defeating all units of all enemies, the\
-           kingdom will repair it\'s peace."
+        messages, decrypt them and use this information to move your troops and defeat all enemy troops. Troops can be moved with three \
+        actions: attack, ambush and defend. \n\nAttacking wins ambushing. \nDefending wins from attacking. \nambush wins from defending.\n\n\
+        In the event of a tie, both sides are notified of the tie and must make a move. \nBy defeating all units of all enemies, the \
+        kingdom will repair it\'s peace."
 
     @staticmethod
     def command_interface():
-        return "To command your units use the following estructure: \n\n" \
+        return "To command your units use the following structure: \n\n" \
                "<action> <target> with <unit> from <unit\'s origin> \n\n" \
-               "An example would be:\n \"attack london with spy from atenas\"" \
+               "An example would be:\n \"attack Dadon with spy from Tila\"" \
                "\n or \n" \
-               "\"defend london with pawn from london\""
+               "\"defend Jumond with warrior from Jumond\""
 
 
 class Util():
