@@ -190,7 +190,7 @@ class Command(models.Model):
                 unit.battle(enemies.__getitem__(randrange(0, len(enemies), 1)))
             else:
                 TelegramApi.getService().sendMessage(
-                    "I "+str(unit.category)+" moved to new location at" + str(event.target) + " with no problems",
+                    "I "+str(unit.category)+" moved to new location at " + str(event.target) + " with no problems",
                     event.player.identifier)
         else:
             TelegramApi.getService().sendMessage(
@@ -309,8 +309,16 @@ class Interface():
             return 'History of where? ( /enter world_name )'
 
     @staticmethod
-    def command_interface():
-        pass
+    def start():
+        return "In this game, each player enters a realm with a certain number of units (pawns and spies). When more than one player \
+        enters the same kingdom, they battle each other to defend the kingdom. The objective of the game is to capture the enemy's \
+        messages, decrypt them and use this information to move your troops and defeat all enemy troops. Troops can be moved with three\
+         statuses: attack, ambush and defend. \nAttack wins by ambushing. \nDefending wins from attacking. \nambush wins from defending.\
+          In the event of a tie, both sides are notified of the tie and must make some move. \nBy defeating all units of all enemies, the\
+           kingdom will again be at peace."
+    
+    # def command_interface():
+    #     pass
 
 
 class Util():
