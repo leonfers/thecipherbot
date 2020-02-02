@@ -310,7 +310,13 @@ class Interface():
 
     @staticmethod
     def start(identifier):
-        return 'History of where? ( /enter world_name )'
+        return "In this game, each player enters a realm with a certain number of units (pawns and spies). When more than one player \
+        enters the same kingdom, they battle each other to defend the kingdom. The objective of the game is to capture the enemy's \
+        messages, decrypt them and use this information to move your troops and defeat all enemy troops. Troops can be moved with three\
+         statuses: attack, ambush and defend. \nAttack wins by ambushing. \nDefending wins from attacking. \nambush wins from defending.\
+          In the event of a tie, both sides are notified of the tie and must make some move. \nBy defeating all units of all enemies, the\
+           kingdom will again be at peace."
+    
     def command_interface():
         pass
 
