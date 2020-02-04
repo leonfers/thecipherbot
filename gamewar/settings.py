@@ -58,7 +58,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'gamewar.urls'
 
-TELEGRAM_KEY = decouple.config('TELEGRAM_KEY')
+TELEGRAM_KEY = os.environ.get('TELEGRAM_KEY')
 
 TEMPLATES = [
     {
