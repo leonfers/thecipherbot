@@ -14,6 +14,7 @@ import os
 import decouple
 import django_heroku
 import dj_database_url
+from decouple import config
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -61,7 +62,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 ROOT_URLCONF = 'gamewar.urls'
 
-TELEGRAM_KEY = 'AAGsYY5nZMwjGngkG8gbahGYKlxiu6VhQxo'
+TELEGRAM_KEY = config('TELEGRAM_KEY')
 
 TEMPLATES = [
     {
