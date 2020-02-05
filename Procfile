@@ -1,2 +1,2 @@
-web: gunicorn gamewar.wsgi --log-file -
+web: gunicorn gamewar.wsgi
 
