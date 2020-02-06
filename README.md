@@ -7,27 +7,27 @@ This project is a API for a telegram bot which is a Real Time Text-based Strateg
 ## Configuring the envioriment (Linux) and the project settings
 
 * Install Python, 
->> sudo apt install python3
+> sudo apt install python3
 
 * Install and configure postgres
->> sudo apt-get install python-pip python-dev libpq-dev postgresql postgresql-contrib
->> sudo su - postgres
->> psql
->> CREATE DATABASE database_name;
->> CREATE USER myprojectuser WITH PASSWORD 'password';
->> ALTER ROLE myprojectuser SET client_encoding TO 'utf8';
->> ALTER ROLE myprojectuser SET default_transaction_isolation TO 'read committed';
->> ALTER ROLE myprojectuser SET timezone TO 'UTC';
->> GRANT ALL PRIVILEGES ON DATABASE database_name TO myprojectuser;
+> sudo apt-get install python-pip python-dev libpq-dev postgresql postgresql-contrib
+> sudo su - postgres
+> psql
+> CREATE DATABASE database_name;
+> CREATE USER myprojectuser WITH PASSWORD 'password';
+> ALTER ROLE myprojectuser SET client_encoding TO 'utf8';
+> ALTER ROLE myprojectuser SET default_transaction_isolation TO 'read committed';
+> ALTER ROLE myprojectuser SET timezone TO 'UTC';
+> GRANT ALL PRIVILEGES ON DATABASE database_name TO myprojectuser;
 
 * Create a vitual envioriment and access it
->> python3 -m venv myvenv
->> source myvenv/bin/activate
+> python3 -m venv myvenv
+> source myvenv/bin/activate
 
 * Configure the env variables
->> touch .env
->> nano .env
->> TELEGRAM_KEY=** (Get your bot api key from the botfather on telegram)
+> touch .env
+> nano .env
+> TELEGRAM_KEY=** (Get your bot api key from the botfather on telegram)
    DEBUG=True
    SECRET_KEY=**
    DATABASE_URL=**
@@ -36,11 +36,11 @@ This project is a API for a telegram bot which is a Real Time Text-based Strateg
    DB_NAME = **
 
 * Update pip and install the dependencies
->>  python -m pip install --upgrade pip
->>  pip install -r requirements.txt
->>  python manage.py makemigrations
->>  python manage.py migrate
->>  python manage.py runserver
+>  python -m pip install --upgrade pip
+>  pip install -r requirements.txt
+>  python manage.py makemigrations
+>  python manage.py migrate
+>  python manage.py runserver
 
 
 __Before deploying in case you are using Debian based distros, check if the package pkg-resources==0.0.0 was created, and remove it if it is present on the requirements.txt file__
@@ -48,13 +48,13 @@ __Before deploying in case you are using Debian based distros, check if the pack
 ### Deploying the API to HEROKU
 
 * Install heroku-cli
->> sudo snap install --classic heroku
->> heroku login
->> heroku git:remote -a thecipher
->> git add .
->> git commit -m "Deploy da aplicação"
->> git push -u heroku master
->> heroku run python manage.py migrate
+> sudo snap install --classic heroku
+> heroku login
+> heroku git:remote -a thecipher
+> git add .
+> git commit -m "Deploy da aplicação"
+> git push -u heroku master
+> heroku run python manage.py migrate
 
 
 ## Testing
