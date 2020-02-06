@@ -10,15 +10,18 @@ This project is a API for a telegram bot which is a Real Time Text-based Strateg
 > sudo apt install python3
 
 * Install and configure postgres
-> sudo apt-get install python-pip python-dev libpq-dev postgresql postgresql-contrib
-> sudo su - postgres
-> psql
-> CREATE DATABASE database_name;
-> CREATE USER myprojectuser WITH PASSWORD 'password';
-> ALTER ROLE myprojectuser SET client_encoding TO 'utf8';
-> ALTER ROLE myprojectuser SET default_transaction_isolation TO 'read committed';
-> ALTER ROLE myprojectuser SET timezone TO 'UTC';
-> GRANT ALL PRIVILEGES ON DATABASE database_name TO myprojectuser;
+
+```bash
+sudo apt-get install python-pip python-dev libpq-dev postgresql postgresql-contrib
+sudo su - postgres
+psql
+CREATE DATABASE database_name;
+CREATE USER myprojectuser WITH PASSWORD 'password';
+ALTER ROLE myprojectuser SET client_encoding TO 'utf8';
+ALTER ROLE myprojectuser SET default_transaction_isolation TO 'read committed';
+ALTER ROLE myprojectuser SET timezone TO 'UTC';
+GRANT ALL PRIVILEGES ON DATABASE database_name TO myprojectuser;
+```
 
 * Create a vitual envioriment and access it
 > python3 -m venv myvenv
