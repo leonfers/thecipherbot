@@ -6,8 +6,10 @@ This project is a API for a telegram bot which is a Real Time Text-based Strateg
 
 ## Configuring the envioriment (Linux) and the project settings
 
-* Install Python, 
-> sudo apt install python3
+* Install Python:
+```bash
+sudo apt install python3
+```
 
 * Install and configure postgres
 
@@ -24,45 +26,49 @@ GRANT ALL PRIVILEGES ON DATABASE database_name TO myprojectuser;
 ```
 
 * Create a vitual envioriment and access it
-> python3 -m venv myvenv
-> source myvenv/bin/activate
+```bash
+python3 -m venv myvenv
+source myvenv/bin/activate
+```
 
 * Configure the env variables
-> touch .env
-> nano .env
-> TELEGRAM_KEY=** (Get your bot api key from the botfather on telegram)
+```bash
+touch .env
+nano .env
+    TELEGRAM_KEY=** (Get your bot api key from the botfather on telegram)
    DEBUG=True
    SECRET_KEY=**
    DATABASE_URL=**
    DB_USER=**
    DB_PASSWORD=**
    DB_NAME = **
+```
 
 * Update pip and install the dependencies
->  python -m pip install --upgrade pip
->  pip install -r requirements.txt
->  python manage.py makemigrations
->  python manage.py migrate
->  python manage.py runserver
-
+```bash
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+python manage.py makemigrations
+python manage.py migrate
+python manage.py runserver
+```
 
 __Before deploying in case you are using Debian based distros, check if the package pkg-resources==0.0.0 was created, and remove it if it is present on the requirements.txt file__
 
 ### Deploying the API to HEROKU
 
-* Install heroku-cli
-> sudo snap install --classic heroku
-> heroku login
-> heroku git:remote -a thecipher
-> git add .
-> git commit -m "Deploy da aplicação"
-> git push -u heroku master
-> heroku run python manage.py migrate
-
+* Install heroku-cli and configure the deploy repo
+```bash
+sudo snap install --classic heroku
+heroku login
+heroku git:remote -a thecipher
+git add .
+git commit -m "Deploy da aplicação"
+git push -u heroku master
+heroku run python manage.py migrate
+```
 
 ## Testing
-
-?
 
 ## About the game
 
