@@ -28,7 +28,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '2cq9kosi+1#kbev_($$i1v6!5dyj5$!fk7$a#1$(w8c2h2(h(1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = config('DEBUG')
 
 ALLOWED_HOSTS = [
    '0.0.0.0', 'localhost', '127.0.0.1', 'thecipher.herokuapp.com'
@@ -84,14 +84,18 @@ WSGI_APPLICATION = 'gamewar.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
+DB_USER = config('DB_USER')
+DB_PASSWORD = config('DB_PASSWORD')
+DB_NAME = config('DB_NAME')
+DATABASE_URL = config('DATABASE_URL')
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'thecipher',
-        'USER': 'thecipher',
-        'PASSWORD': 'thecipher',
-        'HOST': 'localhost',
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DATABASE_URL,
         'PORT': '',
     }
 }
