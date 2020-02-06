@@ -86,3 +86,6 @@ By defeating all enemies, you will repair the realm's peace.
 
 ## Contact Info:
 * Email at leonfersn@gmail.com with the subject "THECIPHER BOT - TELEGRAM - DEV QUESTIONS"
+
+## Info:
+* This game was developed inicialy at the THEGamJam (Global Game Jam 2020) at Teresina, Piaui,  Brazil.
