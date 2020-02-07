@@ -1,0 +1,12 @@
+{
+  "attack": "attack",
+  "defend": "defend",
+  "ambush": "ambush",
+  "command": "command",
+  "overview": "overview",
+  "history": "history",
+  "leave": "leave",
+  "enter": "enter",
+  "help": "help",
+  "action_pattern ": "(\\battack|defend|ambush\\b) (\\b([^\\s]+)\\b) (\\bwith\\b) (\\bspy|warrior\\b) (\\bfrom\\b) (\\b([^\\s]+)\\b)"
+}

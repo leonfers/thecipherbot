@@ -58,7 +58,7 @@ class TelegramUpdate(viewsets.ViewSet):
                 return Response(status=status.HTTP_200_OK)
             elif 'help' in command:
                 identifier = request.data['message']['chat']['id']
-                self.telegram.sendMessage('We use your telegram username as yogit ur name in game, please choose one if you don\'t have already \nChoose a option', identifier, TelegramApi.buildReplyMarkup())
+                self.telegram.sendMessage('', identifier, TelegramApi.buildReplyMarkup())
                 return Response(status=status.HTTP_200_OK)
             else:
                 identifier = request.data['message']['chat']['id']

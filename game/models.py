@@ -379,7 +379,7 @@ class Interface():
                "enters the same kingdom, they battle each other over the kingdom.\nThe objective of the game is to defeat all enemy troops.\nTroops can be moved with three " \
                "actions:\n\n attack, ambush and defend \n\nAttacking wins ambushing.\nAmbushing wins defending.\nDefending wins attacking.\n\n" \
                "Spies only gather information and Warriors can kill other units\n" \
-               "You can intercept (you have to decipher their Ceasar Ciphers) enemy messages and repair it\'s contents to launch counter attacks!" \
+               "You can intercept (you have to decipher their Ceasar Ciphers) enemy messages.json and repair it\'s contents to launch counter attacks!" \
                "\nBy defeating all enemies, you will " \
                "repair the kingdom\'s peace."
 
